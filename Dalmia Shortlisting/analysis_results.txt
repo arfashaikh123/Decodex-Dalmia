@@ -1,0 +1,67 @@
+
+--- Task 1: Demand-Supply Stress Mapping ---
+Date Range: 2025-01-01 00:00:00 to 2025-04-15 00:00:00
+Top 5 Risky City-Zone-Time Windows (Lowest Completion Rate):
+          City  Pickup_Zone  Hour  Total_Requests  Completed_Rides  Avg_Surge  Avg_Battery  Completion_Rate
+78   Bengaluru            4    14               3                0   1.566667    55.000000              0.0
+99   Bengaluru            5    11               4                0   1.275000    52.500000              0.0
+520  Hyderabad            4    13               3                0   1.666667    88.000000              0.0
+544  Hyderabad            5    20               3                0   1.133333    84.000000              0.0
+607  Hyderabad            8    13               3                0   1.300000    48.666667              0.0
+
+Top 5 High Surge City-Zone-Time Windows:
+       City  Pickup_Zone  Hour  Total_Requests  Completed_Rides  Avg_Surge  Avg_Battery  Completion_Rate
+880  Mumbai           10    21               4                4        2.0    47.250000         1.000000
+236   Delhi            1    16               3                2        2.0    62.666667         0.666667
+278   Delhi            3    14               3                2        2.0    57.000000         0.666667
+398   Delhi            9     0               3                2        2.0    70.000000         0.666667
+409   Delhi            9    14               3                1        2.0    48.333333         0.333333
+
+--- Task 2: Cancellation Driver Decomposition ---
+Cancellation by Reason:
+Cancellation_By
+Rider     0.453315
+Driver    0.339648
+System    0.207037
+
+Avg Battery % by Cancellation Reason:
+Cancellation_By
+Driver    54.657371
+Rider     53.274627
+System    51.620915
+
+Driver Cancellations - Avg Battery: 54.66%
+
+
+--- Task 3: Fleet Utilization Efficiency Assessment ---
+Zones with Lowest Surge (Potential Oversupply/Low Usage):
+         City  Pickup_Zone  Total_Rides  Avg_Surge  Completion_Rate
+34     Mumbai            5           67   1.332836         0.686567
+2   Bengaluru            3           59   1.344068         0.728814
+14      Delhi            5           61   1.345902         0.655738
+38     Mumbai            9           60   1.365000         0.683333
+32     Mumbai            3           66   1.368182         0.681818
+35     Mumbai            6           58   1.370690         0.672414
+10      Delhi            1           64   1.373438         0.640625
+28  Hyderabad            9           54   1.383333         0.648148
+9   Bengaluru           10           64   1.395312         0.765625
+4   Bengaluru            5           65   1.396923         0.769231
+
+--- Task 4: Charging Infrastructure Stress Analysis ---
+Top Charging Stations by Wait Time (with Demand Context):
+   Station_ID       City  Zone  Chargers_Available  Avg_Wait_Time_Min  Max_Requests  Mean_Requests  Demand_Peakedness
+39      CS239  Hyderabad     6                   3                 34           186     101.500000           1.832512
+2       CS202  Bengaluru     7                   4                 33           193     122.708333           1.572835
+14      CS214      Delhi     1                   6                 33           189     101.833333           1.855974
+30      CS230      Delhi     5                   2                 32           194     126.000000           1.539683
+28      CS228     Mumbai     1                   4                 31           199     114.708333           1.734835
+7       CS207  Bengaluru     8                   2                 31           199     123.166667           1.615697
+13      CS213  Bengaluru     7                   6                 30           193     122.708333           1.572835
+29      CS229      Delhi     7                   6                 30           190     116.416667           1.632069
+17      CS217     Mumbai     7                   5                 30           186     112.875000           1.647841
+38      CS238  Bengaluru     3                   7                 29           198     113.083333           1.750921
+16      CS216      Delhi     1                   5                 27           189     101.833333           1.855974
+15      CS215     Mumbai     1                   4                 27           199     114.708333           1.734835
+10      CS210  Hyderabad     8                   3                 26           199     102.125000           1.948592
+22      CS222  Hyderabad     1                   6                 26           192     104.875000           1.830751
+27      CS227      Delhi     2                   3                 24           197      99.416667           1.981559

@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-grid-dark-950 text-gray-100 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #121218;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #2d2d3d;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3d3d4d;
+  }
+}
+
+@layer components {
+  .card-grid-dark {
+    @apply bg-grid-dark-800 border border-grid-dark-600 rounded-lg p-6;
+  }
+  
+  .metric-value {
+    @apply text-3xl font-bold font-mono tracking-tight;
+  }
+  
+  .metric-label {
+    @apply text-xs font-medium text-gray-400 uppercase tracking-wider;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-electric-blue-500 hover:bg-electric-blue-400 text-grid-dark-950 font-semibold rounded-lg transition-all duration-200 shadow-glow-blue;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-grid-dark-700 hover:bg-grid-dark-600 text-gray-200 font-medium rounded-lg border border-grid-dark-600 transition-all duration-200;
+  }
+  
+  .badge-peak {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-peak-red-500/20 text-peak-red-300 border border-peak-red-500/40;
+  }
+  
+  .badge-holiday {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-gray-500/20 text-gray-300 border border-gray-500/40;
+  }
+  
+  .badge-success {
+    @apply inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-success-green-500/20 text-success-green-300 border border-success-green-500/40;
+  }
+}

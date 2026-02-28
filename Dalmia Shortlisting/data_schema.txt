@@ -1,0 +1,17 @@
+Sheet names: ['Ride_Level_Data', 'Driver_Data', 'Zone_Hour_Demand', 'Charging_Stations']
+
+--- Sheet: Ride_Level_Data ---
+Columns: ['Ride_ID', 'City', 'Date', 'Hour', 'Pickup_Zone', 'Drop_Zone', 'Ride_Distance_km', 'Estimated_Fare', 'Surge_Multiplier', 'EV_Battery_%', 'Driver_Available', 'Charging_Station_Nearby', 'Weather', 'Ride_Status', 'Cancellation_By']
+First row: {'Ride_ID': 1, 'City': 'Hyderabad', 'Date': Timestamp('2025-01-01 00:00:00'), 'Hour': 5, 'Pickup_Zone': 8, 'Drop_Zone': 3, 'Ride_Distance_km': 21.59, 'Estimated_Fare': 374.64, 'Surge_Multiplier': 2, 'EV_Battery_%': 29, 'Driver_Available': 'Yes', 'Charging_Station_Nearby': 'Yes', 'Weather': 'Heavy Rain', 'Ride_Status': 'Completed', 'Cancellation_By': nan}
+
+--- Sheet: Driver_Data ---
+Columns: ['Driver_ID', 'City', 'Experience_Months', 'Avg_Rating', 'Total_Rides_Last_30_Days', 'Avg_Battery_Consumption_km', 'Cancellation_Rate_%']
+First row: {'Driver_ID': 1, 'City': 'Mumbai', 'Experience_Months': 38, 'Avg_Rating': 4.34, 'Total_Rides_Last_30_Days': 113, 'Avg_Battery_Consumption_km': 0.2, 'Cancellation_Rate_%': 11.76}
+
+--- Sheet: Zone_Hour_Demand ---
+Columns: ['City', 'Zone', 'Hour', 'Avg_Ride_Requests', 'Avg_Cancellations']
+First row: {'City': 'Mumbai', 'Zone': 1, 'Hour': 0, 'Avg_Ride_Requests': 177, 'Avg_Cancellations': 6}
+
+--- Sheet: Charging_Stations ---
+Columns: ['Station_ID', 'City', 'Zone', 'Chargers_Available', 'Avg_Wait_Time_Min']
+First row: {'Station_ID': 'CS200', 'City': 'Mumbai', 'Zone': 10, 'Chargers_Available': 2, 'Avg_Wait_Time_Min': 13}

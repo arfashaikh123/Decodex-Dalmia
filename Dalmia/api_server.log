@@ -1,0 +1,5 @@
+[STARTUP] Loading training data...
+[SERVER] Starting on http://localhost:5000
+[SERVER] Model training in background (~2 min). Check /api/status
+ * Serving Flask app 'api_server'
+ * Debug mode: off

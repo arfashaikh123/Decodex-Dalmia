@@ -1,0 +1,40 @@
+> Name: <Unknown>
+> Time: 2026/02/28 04:32 - 2026/02/28 04:39
+ Core Content
+ Knowledge Framework
+
+ 1. Case Study Approach
+- Knowledge Point1.1: Leveraging Technology for Problem Solving
+    - Explaination:
+        - AI Tools: Utilizing tools like Claude, Codex, Notebook LLM, and Slide Cleaner to expedite tasks such as code generation and presentation creation.
+        - Focus on Thinking: Emphasizing critical thinking over manual coding, as AI tools can handle repetitive coding tasks.
+        - Efficient Workflow: Streamlining processes by using AI for initial drafts and then refining them.
+- Knowledge Point1.2: Iterative Problem Solving
+    - Explaination:
+        - Intermediate Outputs: Requiring intermediate outputs to assess the evolution of thought processes and problem-solving approaches.
+        - Adaptive Testing: Adjusting the release of details to test thinking capabilities as the case progresses.
+        - Technology Advancement: Utilizing modern technology to enhance the evaluation of problem-solving skills.
+
+ 2. Case 2: Mumbai Data Analysis
+- Knowledge Point2.1: Time Series Data Analysis
+    - Explaination:
+        - Load Data: Analyzing time series data representing electrical load in Mumbai at 15-minute intervals.
+        - Pattern Recognition: Identifying layers of patterns in the data, including the impact of events like COVID-19.
+        - Behavioral Shifts: Understanding how human behavior (e.g., weekday vs. weekend, post-COVID changes) and external factors (e.g., weather) influence load patterns.
+- Knowledge Point2.2: Future Stages of Case 2
+    - Explaination:
+        - Constraints: Incorporating specific constraints into the analysis.
+        - Out-of-Time Samples: Evaluating performance on out-of-time samples to predict load behavior.
+
+ 3. Case 3: Dubai Route Planning
+- Knowledge Point3.1: Public Transportation Optimization
+    - Explaination:
+        - Bus Route Data: Analyzing data related to bus routes, start/stop points, and ridership in Dubai.
+        - Network Optimization: Identifying trends in ridership (increasing or decreasing) to optimize the transportation network.
+        - Stress Identification: Detecting areas of stress within the public transportation network.
+- Knowledge Point3.2: External Factors in Ridership
+    - Explaination:
+        - Temporal Patterns: Considering the impact of the time of year and day of the week on ridership.
+        - Tourist Impact: Recognizing the influence of tourism on public transportation usage in cities like Dubai.
+        - Holistic Analysis: Encouraging consideration of external factors beyond the immediate dataset for a comprehensive understanding.
+

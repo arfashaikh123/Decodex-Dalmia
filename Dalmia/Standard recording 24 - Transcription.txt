@@ -1,0 +1,221 @@
+Standard recording 24 - Transcription
+
+Time:  28 February 2026 10:02:59
+Topic:  Standard recording 24
+
+00:00
+So, this 34 hours is actually not too much if you think of it, right?
+
+00:04
+So, if you have Claude or if you have Codex, correct, you can directly write your code very quickly, okay?
+
+00:16
+If you do exactly what you do, so you should focus on your thinking, not so much on your coding, because coding is coding is dead, right?
+
+00:26
+You need to know.What do you want?
+
+00:29
+If you, if anyone who wants to become a coder, who wants to become a developer, please don't.
+
+00:37
+You have been not been treating me, or you have not been doing anything.
+
+00:43
+OK, by the way, this presentation, you see, do you like this presentation?
+
+00:47
+The slides, it took me two minutes to pick.
+
+00:51
+Any guess?Which from where?
+
+00:58
+Jenspark.Notebook LLM.I went to Notebook LLM.
+
+01:06
+I put all my guidelines and I said slide deck.
+
+01:10
+I gave a prompt and it gave me notebook LLM.
+
+01:14
+Then I went to slide cleaner and removed the watermark.
+
+01:23
+And I'm trying to impress upon you like I have made this slides.
+
+01:27
+OK, what I'm trying to tell you is don't waste time.
+
+01:32
+So you don't have to waste time in beginning slides.
+
+01:34
+You can make slides as long as you give the right inputs, the slides will be there.
+
+01:39
+But if you give wrong inputs, it will be junk.
+
+01:43
+So this 24 hours is not too much if you really ask me.
+
+01:50
+And that's the reason why I made this little complicated.
+
+01:53
+Okay, now you have all the facility in the world, and I'm giving you all the access in the world.
+
+02:00
+You can call your mummy, daddy, anything, right?
+
+02:03
+So you can solve this case in a faster way.
+
+02:06
+So you don't have to look at error in your code or find out anything more.
+
+02:13
+I hope I'm making sense here.
+
+02:15
+And that's the reason why I'm not releasing all the details.
+
+02:20
+OK, so because I want to test your thinking process as the case evolves, and that's the reason why I want your intermediate output rate as well, just to see how things evolve.
+
+02:34
+Alright, last year we used to do like release everything at one go, but with technology advancement, I think this is a better way to test your thinking capability.
+
+02:46
+OK, alright, so this is case 2.
+
+02:50
+And this is actually Mumbai's data.
+
+02:55
+So, we are using later city right now.
+
+02:58
+There is a consumption.
+
+02:59
+So there's a huge lot of data around 15 minutes interval.
+
+03:06
+Worst case study though?
+
+03:07
+All right.So they have, you have, you have, the data looks very simple.
+
+03:14
+Okay.It's just a time series data.
+
+03:16
+What is the look?
+
+03:20
+What is the load in Mumbai at anything very central?
+
+03:23
+That's as simple as that.
+
+03:25
+Wow, it's very simple, but I'm checking on it has COVID in it, right?
+
+03:32
+So there was 2080 COVID inside.
+
+03:34
+So the behavior and the load change happens with time.
+
+03:39
+There are layers of patterns in the data.
+
+03:43
+For example, you understand how humans behave, right?
+
+03:47
+on weekday we go to office, on weekend, at home, after COVID, the last thing is shifted.
+
+03:54
+So, accordingly, you see the load pattern will also shift, correct?
+
+04:00
+Weather will also shift, right?
+
+04:02
+So, it will look very trivial when you see it, but actually it's not.
+
+04:09
+Okay, so that's your case too.
+
+04:13
+What will probably happen, I will...
+
+04:15
+I will quickly tell you what will happen in stage 2 and stage 3, all right?
+
+04:19
+You will get, so basically you will get a constraint and you will also get an out of time sample to see how what happens at a particular load, and that's it.
+
+04:35
+So, I'll go to case 3.I'll go to case 3.
+
+04:40
+Yeah, case three.Okay, case three is on planning, planning a route.
+
+04:50
+Okay, how many of you are from Bombay?
+
+04:53
+Okay, great.How many of you have taken Metro?
+
+04:58
+Okay.So what do you think about metros?
+
+05:02
+Have they reduced traffic on the road?
+
+05:05
+No?All right.So this is the case about that, right?
+
+05:10
+So you have, I've taken not Mumbai, but I've taken Dubai as a city.
+
+05:16
+So if you look at Dubai as a city, there is a RTA network.
+
+05:20
+And there are different buses, different routes, and there are huge, the data is about bus routes.
+
+05:28
+and then start and stop points, ridership, how much time they wait, blah, blah, blah.
+
+05:36
+And you have to figure out which route is going up in ridership, which route is going down in ridership, what is happening there.
+
+05:46
+And you have to figure basically out, and optimize the route, and optimize the network.
+
+05:53
+You have to figure out if there is a stress in the network.
+
+05:56
+So, ridership also gets impacted based on the time of the year, the day of the week, correct?
+
+06:07
+Any other patterns?And you look at Dubai, how many of you have been to Dubai?
+
+06:13
+How many of you have been to Dubai?
+
+06:17
+I also have been to Dubai, but it will definitely get impacted by tourists.
+
+06:21
+And things like that, right?
+
+06:23
+So...It will be there, hopefully, in your data what do you look at, so I will encourage you to also look at things which are outside as well, so, like I'm saying, right, this is Dubai, so...
+
