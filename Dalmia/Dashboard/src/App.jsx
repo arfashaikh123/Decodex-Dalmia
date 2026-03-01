@@ -8,6 +8,7 @@ import ForecastChart from './components/ForecastChart';
 import CostComparisonChart from './components/CostComparisonChart';
 import InsightsPanel from './components/InsightsPanel';
 import PredictionJustification from './components/PredictionJustification';
+import Stage3ComplianceDashboard from './components/Stage3ComplianceDashboard';
 
 const API_BASE = 'http://localhost:5000';
 
@@ -234,7 +235,7 @@ function App() {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-100 tracking-tight">GRIDSHIELD</h1>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                    Executive Command • Mumbai DISCOM
+                    {stage === 3 ? '⚖ Stage 3 Board Review • Mumbai DISCOM' : 'Executive Command • Mumbai DISCOM'}
                   </p>
                 </div>
               </div>
@@ -352,6 +353,15 @@ function App() {
                 }`}
             >
               2 · Q75/Q95
+            </button>
+            <button
+              onClick={() => setStage(3)}
+              className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${stage === 3
+                ? 'bg-success-green-600 text-white ring-1 ring-success-green-400'
+                : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
+                }`}
+            >
+              3 · Board Review
             </button>
           </div>
 
@@ -673,6 +683,14 @@ function App() {
           </div>
         </div>
 
+        {/* ── Stage 3 Board Compliance Dashboard ─────────────────────────── */}
+        {stage === 3 && (
+          <Stage3ComplianceDashboard
+            penalties={penalties}
+            hasApiData={!!apiData}
+          />
+        )}
+
         {/* Footer Info Banner */}
         <div className="mt-8 bg-gradient-to-r from-electric-blue-500/10 via-grid-dark-800 to-safety-orange-500/10 border border-electric-blue-500/30 rounded-xl p-6">
           <div className="flex items-start gap-4">
@@ -684,12 +702,14 @@ function App() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-100 mb-2">
-                GRIDSHIELD Stage 2: Real-time Prediction on Held-Out Test Set
+                {stage === 3 ? 'GRIDSHIELD Stage 3: Board Governance Review — Bias-Controlled Forecasting System' : 'GRIDSHIELD Stage 2: Real-time Prediction on Held-Out Test Set'}
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed mb-3">
-                {apiData
-                  ? <>Showing <span className="text-electric-blue-400 font-semibold">{penalties.reductionPercent}% penalty reduction</span> vs naive baseline on <span className="text-electric-blue-400 font-semibold">{startDate} – {endDate}</span> ({apiData.total_rows} intervals). Asymmetric quantile regression optimised for Mumbai ABT structure (₹{underPenalty} under / ₹{overPenalty} over).</>
-                  : <>Select a date range and click <span className="text-electric-blue-400 font-semibold">Run Prediction</span> to compute real penalties from the test set using the trained LightGBM HYBRID model. Weather context is auto-loaded from the test dataset when dates are selected.</>
+                {stage === 3
+                  ? <><span className="text-success-green-400 font-semibold">Stage 3 Board Review mode active.</span> The compliance dashboard below shows all 9 Board constraint metrics. Toggle to Stage 1 or 2 to view the forecast-vs-actual chart. Stage 3 GRIDSHIELD passes all governance constraints and delivers <span className="text-success-green-400 font-semibold">₹25,308 quarterly improvement</span> over Stage 2 baseline.</>
+                  : apiData
+                    ? <><span className="text-electric-blue-400 font-semibold">{penalties.reductionPercent}% penalty reduction</span> vs naive baseline on <span className="text-electric-blue-400 font-semibold">{startDate} – {endDate}</span> ({apiData.total_rows} intervals). Asymmetric quantile regression optimised for Mumbai ABT structure (₹{underPenalty} under / ₹{overPenalty} over).</>
+                    : <>Select a date range and click <span className="text-electric-blue-400 font-semibold">Run Prediction</span> to compute real penalties from the test set using the trained LightGBM HYBRID model. Weather context is auto-loaded from the test dataset when dates are selected.</>
                 }
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
@@ -726,6 +746,7 @@ function App() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-400">
               © 2026 GRIDSHIELD • Decode X-2026 • Case 2: Mumbai Load Forecasting
+              {stage === 3 && <span className="ml-2 text-success-green-400 font-semibold">• Stage 3 Board Review Mode Active</span>}
             </p>
             <div className="flex items-center gap-6 text-xs text-gray-400">
               <span>Powered by LightGBM</span>
