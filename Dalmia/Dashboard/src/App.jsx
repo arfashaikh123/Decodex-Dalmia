@@ -28,11 +28,24 @@ function WeatherStatCard({ icon: Icon, label, value, unit, sub, color = 'text-el
 }
 
 function App() {
-  // Penalty rate state (still configurable, used in prediction)
+  // Penalty rate state — auto-updated by stage, still manually overridable
   const [underPenalty, setUnderPenalty] = useState(4);
   const [overPenalty, setOverPenalty] = useState(2);
-  // Stage: 1 = stable/training-period policy, 2 = post-deployment (default)
+  // Stage: 1 = Round 1 (₹4/₹2), 2 = Round 2 (₹6/₹2), 3 = Board Review (₹6/₹2)
   const [stage, setStage] = useState(2);
+
+  // Auto-sync penalty rates to the hackathon-defined values per stage
+  const handleStageChange = React.useCallback((newStage) => {
+    setStage(newStage);
+    if (newStage === 1) {
+      setUnderPenalty(4);
+      setOverPenalty(2);
+    } else {
+      // Stage 2 and Stage 3: Dalmia Round 2 has stricter ₹6 under penalty
+      setUnderPenalty(6);
+      setOverPenalty(2);
+    }
+  }, []);
 
   // API / prediction state
   const [startDate, setStartDate] = useState('2021-05-01');
@@ -332,34 +345,37 @@ function App() {
             <span className="text-xs text-gray-500">₹/kW</span>
           </div>
 
-          {/* Stage Selector */}
+          {/* Stage Selector — auto-sets correct penalty rate per stage */}
           <div className="flex items-center gap-2 px-3 py-1 bg-grid-dark-800 border border-grid-dark-700 rounded-lg">
             <GitBranch className="w-3 h-3 text-electric-blue-400" />
             <span className="text-xs text-gray-400 font-semibold">Stage:</span>
             <button
-              onClick={() => setStage(1)}
+              onClick={() => handleStageChange(1)}
               className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${stage === 1
                 ? 'bg-electric-blue-500 text-white'
                 : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
                 }`}
+              title="Stage 1: Round 1 penalty ₹4 under / ₹2 over"
             >
-              1 · Q67/Q90
+              1 · Q67/Q90 · ₹4/₹2
             </button>
             <button
-              onClick={() => setStage(2)}
+              onClick={() => handleStageChange(2)}
               className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${stage === 2
                 ? 'bg-safety-orange-500 text-white'
                 : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
                 }`}
+              title="Stage 2: Round 2 penalty ₹6 under / ₹2 over"
             >
-              2 · Q75/Q95
+              2 · Q75/Q95 · ₹6/₹2
             </button>
             <button
-              onClick={() => setStage(3)}
+              onClick={() => handleStageChange(3)}
               className={`px-2 py-0.5 rounded text-xs font-bold transition-all ${stage === 3
                 ? 'bg-success-green-600 text-white ring-1 ring-success-green-400'
                 : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
                 }`}
+              title="Stage 3: Board Review — governance layer on ₹6/₹2 regime"
             >
               3 · Board Review
             </button>
@@ -688,6 +704,9 @@ function App() {
           <Stage3ComplianceDashboard
             penalties={penalties}
             hasApiData={!!apiData}
+            abuData={apiData?.asymmetric_bias_uplift}
+            penaltyUnder={underPenalty}
+            penaltyOver={overPenalty}
           />
         )}
 
