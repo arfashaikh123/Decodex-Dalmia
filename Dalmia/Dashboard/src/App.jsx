@@ -10,7 +10,7 @@ import InsightsPanel from './components/InsightsPanel';
 import PredictionJustification from './components/PredictionJustification';
 import Stage3ComplianceDashboard from './components/Stage3ComplianceDashboard';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://decodex-dalmia.onrender.com';
 
 function WeatherStatCard({ icon: Icon, label, value, unit, sub, color = 'text-electric-blue-400' }) {
   return (
