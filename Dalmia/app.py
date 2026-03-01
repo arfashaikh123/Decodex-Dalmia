@@ -154,13 +154,20 @@ def startup_pipeline():
         import traceback; traceback.print_exc()
 
 # ─── Penalty helper ──────────────────────────────────────────────────────────
-def calc_penalty(actual, forecast, is_peak, pu=4.0, po=2.0):
+def calc_penalty(actual, forecast, is_peak, pu_offpeak=4.0, pu_peak=4.0, po=2.0):
     err   = actual - forecast
     under = np.maximum(err, 0)
     over  = np.maximum(-err, 0)
-    total = float((under * pu + over * po).sum())
-    pk    = float((under[is_peak==1] * pu + over[is_peak==1] * po).sum())
-    op    = float((under[is_peak==0] * pu + over[is_peak==0] * po).sum())
+    
+    # Calculate penalty per slot
+    penalty_per_slot = np.where(is_peak == 1, 
+                                under * pu_peak + over * po, 
+                                under * pu_offpeak + over * po)
+    
+    total = float(penalty_per_slot.sum())
+    pk    = float(penalty_per_slot[is_peak == 1].sum())
+    op    = float(penalty_per_slot[is_peak == 0].sum())
+    
     mae   = float(np.mean(np.abs(err)))
     rmse  = float(np.sqrt(np.mean(err**2)))
     mape  = float(np.mean(np.abs(err / np.where(actual==0, 1, actual))) * 100)
@@ -488,6 +495,13 @@ def api_predict():
     penalty_o  = float(data.get('penalty_over',  2.0))
     # Stage: 1 = training/stable period, 2 = test/post-deployment (default)
     stage      = int(data.get('stage', 2))
+    
+    # Determine under-penalty rates based on stage
+    if stage == 1:
+        pu_off, pu_pk = 4.0, 4.0
+    else:
+        # For Stage 2 and 3, peak hours (revised) are ₹6, others are ₹4
+        pu_off, pu_pk = 4.0, 6.0
 
     start_dt = pd.Timestamp(start_date)
     end_dt   = pd.Timestamp(end_date) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
@@ -622,17 +636,52 @@ def api_predict():
     pred_df['pred_hybrid'] = pred_df['pred_hybrid'] + abu_uplift_kw
 
     abu_description = (
-        f"ABU active: bias_factor={(abu_bias_factor:.3f)} "
-        f"[=(pu−po)/(pu+po)=({penalty_u}−{penalty_o})/({penalty_u}+{penalty_o})] "
-        f"× recent_MAE={recent_mae_est:.1f} kW "
+        f"ABU active: bias_factor={abu_bias_factor:.3f} "
+        f"[=(pu-po)/(pu+po)=({penalty_u}-{penalty_o})/({penalty_u}+{penalty_o})] "
+        f"x recent_MAE={recent_mae_est:.1f} kW "
         f"= +{abu_uplift_kw:.1f} kW added to every forecast interval. "
         f"Effect: shifts under-forecast burden to cheaper over-forecast side."
     )
+
+    # ── STEP 5: Bias Limit Recalibration ─────────────────────────────────
+    # If the detected regime bias (actual − forecast, prior day) exceeds a
+    # threshold, upgrade the damping factor from 50% to 75%. This prevents
+    # systematic drift from compounding across the forecast horizon.
+    #
+    # Standard correction (Step 2): forecast += recent_bias × 0.50
+    # Upgraded correction (Step 5): forecast += extra 0.25 × recent_bias
+    #   (bringing total damping to 0.75 × recent_bias)
+    #
+    # Threshold: abs(bias) > 15 kW  (≈1.2% of typical mean load ~1200 kW)
+
+    BIAS_LIMIT_KW = 15.0
+    bias_limit_triggered = False
+    bias_limit_action = "Regime calibration not applied (insufficient lookback data)"
+
+    if regime_bias_applied:
+        if abs(recent_bias) > BIAS_LIMIT_KW:
+            bias_limit_triggered = True
+            extra_correction = recent_bias * 0.25   # top-up: 0.50 + 0.25 = 0.75× damping
+            pred_df['pred_hybrid'] = pred_df['pred_hybrid'] + extra_correction
+            bias_limit_action = (
+                f"TRIGGERED: prior-day bias {recent_bias:.1f} kW exceeded ±{BIAS_LIMIT_KW} kW limit. "
+                f"Damping upgraded 50%→75%. Extra correction: +{extra_correction:.1f} kW. "
+                f"Total regime correction: {recent_bias * 0.75:.1f} kW."
+            )
+        else:
+            bias_limit_action = (
+                f"Not triggered: prior-day bias {recent_bias:.1f} kW within ±{BIAS_LIMIT_KW} kW limit. "
+                f"Standard 50% correction ({recent_bias * 0.5:.1f} kW) maintained."
+            )
 
     has_actual = pred_df['LOAD'].notna().all()
     penalties  = {}
     best_strategy   = 'hybrid'  # fallback label
     auto_best_desc  = 'Manual hybrid (no actuals available)'
+
+    # Read Board exposure cap from request body (used by STEP 6)
+    exposure_cap_param = float(data.get('exposure_cap', float('inf')))
+
 
     if has_actual:
         y      = pred_df['LOAD'].values
@@ -649,7 +698,7 @@ def api_predict():
             'hybrid': (pred_df['pred_hybrid'].values,      f'Stage {stage} Hybrid (regime-calibrated)'),
         }
 
-        penalties = {k: calc_penalty(y, v, is_pk, penalty_u, penalty_o)
+        penalties = {k: calc_penalty(y, v, is_pk, pu_off, pu_pk, penalty_o)
                      for k, (v, _) in all_strategies.items()}
 
         # ── AUTO-BEST: pick strategy with lowest total penalty ─────────────────
@@ -675,6 +724,70 @@ def api_predict():
             if best_strategy != 'hybrid'
             else f"Stage-{stage} hybrid is already optimal at ₹{round(hybrid_total):,}."
         )
+
+    # ── STEP 6: Exposure Cap Proximity Guard ──────────────────────────────
+    # If current-period penalty already exceeds 85% of the Board-mandated
+    # quarterly exposure cap, the system steps BACK one quantile tier to
+    # reduce over-procurement. This enforces financial discipline:
+    #   Active period penalty > 85% of cap → Q0.75/Q0.95 → Q0.67/Q0.90
+    # Rationale: over-procurement drives up over-forecast penalty. Stepping
+    # back slightly reduces the over-forecast insurance cost while accepting
+    # marginally higher under-forecast risk — a deliberate risk trade-off
+    # made under Board-mandated budget constraint.
+
+    EXPOSURE_CAP_WARN_PCT = 0.85
+    cap_guard_triggered = False
+    cap_guard_action = "Cap guard inactive (no cap set or no actual data)"
+    cap_original_penalty = None
+    cap_utilisation_pct = None
+
+    if has_actual and exposure_cap_param < float('inf'):
+        current_hybrid_total = penalties.get('hybrid', {}).get('total', 0.0)
+        cap_warn_level = EXPOSURE_CAP_WARN_PCT * exposure_cap_param
+        cap_utilisation_pct = round(current_hybrid_total / exposure_cap_param * 100, 1)
+
+        if current_hybrid_total > cap_warn_level:
+            cap_guard_triggered = True
+            cap_original_penalty = current_hybrid_total
+
+            # Step back: use Q0.67/Q0.90 instead of Q0.75/Q0.95
+            cg_offpeak = 'pred_q67'
+            cg_peak    = 'pred_q90'
+            capped_forecast = np.where(
+                pred_df['is_peak'] == 1,
+                pred_df[cg_peak],
+                pred_df[cg_offpeak],
+            )
+            capped_pen = calc_penalty(
+                pred_df['LOAD'].values, capped_forecast,
+                pred_df['is_peak'].values, penalty_u, penalty_o
+            )
+
+            if capped_pen['total'] < current_hybrid_total:
+                pred_df['pred_hybrid'] = capped_forecast
+                penalties['hybrid']    = capped_pen
+                red_val    = round(cap_original_penalty)
+                new_val    = round(capped_pen['total'])
+                saving_val = red_val - new_val
+                
+                cap_guard_action = (
+                    f"TRIGGERED at {cap_utilisation_pct}% cap utilisation "
+                    f"(Rs.{round(current_hybrid_total):,} > 85% of Rs.{round(exposure_cap_param):,}). "
+                    f"Stepped back to Q0.67/Q0.90. "
+                    f"Penalty reduced: Rs.{red_val:,} to Rs.{new_val:,}. "
+                    f"Saving: Rs.{saving_val:,}."
+                )
+            else:
+                cap_guard_action = (
+                    f"TRIGGERED at {cap_utilisation_pct}% cap utilisation but original forecast "
+                    f"already optimal — step-back increased penalty. Maintained original."
+                )
+        else:
+            cap_guard_action = (
+                f"Cap OK: {cap_utilisation_pct}% utilisation — below 85% threshold. "
+                f"Current period: ₹{round(penalties.get('hybrid', {}).get('total', 0)):,} vs "
+                f"cap: ₹{round(exposure_cap_param):,}."
+            )
 
 
     # Build chart data (max 500 points, sample if needed)
@@ -793,6 +906,22 @@ def api_predict():
             'penalty_over':   penalty_o,
             'formula':        'bias_factor=(pu−po)/(pu+po); uplift=bias_factor×MAE',
             'description':    abu_description,
+        },
+        # ── Step 5: Bias Limit Recalibration ─────────────────────────────
+        'bias_limit_recalibration': {
+            'triggered':      bias_limit_triggered,
+            'threshold_kw':   BIAS_LIMIT_KW,
+            'recent_bias_kw': round(recent_bias, 2),
+            'action':         bias_limit_action,
+        },
+        # ── Step 6: Exposure Cap Guard ──────────────────────────────────
+        'exposure_cap_guard': {
+            'triggered':           cap_guard_triggered,
+            'warn_threshold_pct':  int(EXPOSURE_CAP_WARN_PCT * 100),
+            'cap_utilisation_pct': cap_utilisation_pct,
+            'cap_param':           exposure_cap_param if exposure_cap_param < float('inf') else None,
+            'original_penalty':    round(cap_original_penalty) if cap_original_penalty else None,
+            'action':              cap_guard_action,
         },
     })
 

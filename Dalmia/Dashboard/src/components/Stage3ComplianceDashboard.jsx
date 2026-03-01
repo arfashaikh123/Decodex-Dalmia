@@ -20,14 +20,14 @@ import {
 
 const STAGE2_BASELINE = {
   label: 'Stage 2 Baseline (Uncontrolled MSE)',
-  penaltyRate: '₹6 under / ₹2 over',
-  totalPenalty: 346031,   // recalculated at ₹6/₹2
-  peakPenalty: 52943,    // 15.3% of total
-  offPeakPenalty: 293088, // 84.7% of total
-  underPenalty: 280400,   // 46,733 kWh × ₹6
-  overPenalty: 65631,    // 32,816 kWh × ₹2 (unchanged)
-  bias: 0.54,             // positive → under-forecast risk (kWh metric, unchanged)
-  p95Deviation: 101.95,   // kWh metric, unchanged
+  penaltyRate: '₹6 Peak / ₹4 Base / ₹2 Over',
+  totalPenalty: 266864,   // recalculated at ₹6 peak / ₹4 base
+  peakPenalty: 52941,    // Under @ ₹6 + Over @ ₹2 during 6-10 PM
+  offPeakPenalty: 213923,
+  underPenalty: 201232,   // (7,150 kWh × ₹6) + (39,583 kWh × ₹4)
+  overPenalty: 65632,    // 32,816 kWh × ₹2
+  bias: 0.54,
+  p95Deviation: 101.95,
   mape: 3.03,
   mae: 37.24,
   bufferUplift: '~6.5 kW (insufficient)',
@@ -36,13 +36,13 @@ const STAGE2_BASELINE = {
 
 const STAGE3_GRIDSHIELD = {
   label: 'Stage 3 GRIDSHIELD (Governed)',
-  penaltyRate: '₹6 under / ₹2 over',
-  totalPenalty: 292607,   // recalculated at ₹6/₹2
-  peakPenalty: 49158,    // 16.8% of total
-  offPeakPenalty: 243449, // 83.2% of total
-  underPenalty: 196050,   // 32,675 kWh × ₹6
-  overPenalty: 96557,    // 48,279 kWh × ₹2 (unchanged)
-  bias: -0.61,            // negative → protective over-forecast (kWh metric)
+  penaltyRate: '₹6 Peak / ₹4 Base / ₹2 Over',
+  totalPenalty: 238236,   // recalculated at ₹6 peak / ₹4 base
+  peakPenalty: 49158,    // Under @ ₹6 + Over @ ₹2 during 6-10 PM
+  offPeakPenalty: 189078,
+  underPenalty: 141678,   // (5,489 kWh × ₹6) + (27,186 kWh × ₹4)
+  overPenalty: 96558,    // 48,279 kWh × ₹2
+  bias: -0.61,
   p95Deviation: 101.63,
   mape: 3.19,
   mae: 37.90,
@@ -77,15 +77,15 @@ const BASE_CONSTRAINTS = [
     baseline: `₹${STAGE2_BASELINE.peakPenalty.toLocaleString('en-IN')}`, baselinePass: STAGE2_BASELINE.peakPenalty <= 60000,
     stage1: `₹${STAGE1_HYBRID.peakPenalty.toLocaleString('en-IN')} (@ ₹4)`, stage1Pass: STAGE1_HYBRID.peakPenalty <= 40000,
     stage3: `₹${STAGE3_GRIDSHIELD.peakPenalty.toLocaleString('en-IN')}`, stage3Pass: STAGE3_GRIDSHIELD.peakPenalty <= 60000,
-    detail: 'Board cap: ₹60K at ₹6/kWh (S2/S3) vs ₹40K at ₹4/kWh (S1). Stage 3 peak penalty = ₹49,158 (₹6 regime) vs Stage 2 = ₹52,943. Both within the ₹60K ceiling. Stage 3 saves ₹3,785 (7.1%) on peak via Peak Reliability Guardrail.'
+    detail: 'Board cap: ₹60K at ₹6/kWh peak rate (S2/S3) vs ₹40K at ₹4/kWh (S1). Stage 3 peak penalty = ₹49,158 (using ₹6/₹2 peak logic) vs Stage 2 = ₹52,941. Both within the ₹60K ceiling. Stage 3 saves ₹3,783 (7.1%) on peak via Peak Reliability Guardrail.'
   },
   {
     id: 3, metric: 'Off-Peak Penalty',
-    requirement: '≤ ₹3,20,000 per quarter  (S2/S3 @ ₹6/kW)',
+    requirement: '≤ ₹3,20,000 per quarter  (S2/S3 @ ₹4/kW)',
     baseline: `₹${STAGE2_BASELINE.offPeakPenalty.toLocaleString('en-IN')}`, baselinePass: STAGE2_BASELINE.offPeakPenalty <= 320000,
-    stage1: `₹${STAGE1_HYBRID.offPeakPenalty.toLocaleString('en-IN')} (@ ₹4)`, stage1Pass: STAGE1_HYBRID.offPeakPenalty <= 215000,
+    stage1: `₹${STAGE1_HYBRID.offPeakPenalty.toLocaleString('en-IN')}`, stage1Pass: STAGE1_HYBRID.offPeakPenalty <= 215000,
     stage3: `₹${STAGE3_GRIDSHIELD.offPeakPenalty.toLocaleString('en-IN')}`, stage3Pass: STAGE3_GRIDSHIELD.offPeakPenalty <= 320000,
-    detail: 'Board cap: ₹3,20,000 at ₹6/kWh regime. Stage 2 MSE off-peak = ₹2,93,088 (within cap). Stage 3 Q0.667 = ₹2,43,449 - saves ₹49,639 (16.9%) via deliberate over-forecast strategy. Stage 1 at ₹4/kWh: ₹1,89,074 (different rate scale - not directly comparable).'
+    detail: 'Board cap: ₹3,20,000 at ₹4/kWh standard rate. Stage 2 MSE off-peak = ₹2,13,923 (within cap). Stage 3 GRIDSHIELD = ₹1,89,078 - saves ₹24,845 (11.6%) via deliberate over-forecast strategy. Stage 1 at ₹4/kWh: ₹1,89,074 - comparable due to same rate scale.'
   },
   { id: 4, metric: 'Exposure Cap Compliance', isCap: true, isCapCompliance: true },
   {

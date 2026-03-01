@@ -11,7 +11,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
   const totalChange = data.reduce((sum, d) => sum + (d.percentChange || 0), 0) / data.length;
   const maxChange = Math.max(...data.map(d => Math.abs(d.percentChange || 0)));
   const isSignificantlyModified = Math.abs(totalChange) > 1;
-  
+
   // Format data for chart (every 4th point/hourly for cleaner display)
   const chartData = data.filter((_, idx) => idx % 4 === 0).map(point => ({
     time: formatChartTime(point.datetime),
@@ -44,22 +44,21 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
       const data = payload[0].payload;
       const safetyBuffer = data.forecast && data.actual ? data.forecast - data.actual : null;
       const percentChange = data.percentChange || 0;
-      
+
       return (
         <div className="bg-grid-dark-800 border border-electric-blue-500/30 rounded-lg p-4 shadow-xl max-w-xs">
           <p className="text-xs text-gray-400 mb-2">{data.time} IST</p>
-          
+
           {/* Show modification banner if changed */}
           {Math.abs(percentChange) > 0.5 && (
-            <div className={`mb-3 px-2 py-1 rounded text-xs font-bold ${
-              percentChange > 0 
-                ? 'bg-safety-orange-500/20 text-safety-orange-400' 
+            <div className={`mb-3 px-2 py-1 rounded text-xs font-bold ${percentChange > 0
+                ? 'bg-safety-orange-500/20 text-safety-orange-400'
                 : 'bg-electric-blue-500/20 text-electric-blue-400'
-            }`}>
+              }`}>
               Modified: {percentChange > 0 ? '+' : ''}{percentChange.toFixed(1)}% from baseline
             </div>
           )}
-          
+
           <div className="space-y-1">
             <div className="flex items-center justify-between gap-4">
               <span className="text-xs text-gray-400">Forecast:</span>
@@ -78,15 +77,14 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             {safetyBuffer != null && (
               <div className="flex items-center justify-between gap-4">
                 <span className="text-xs text-gray-400">Buffer:</span>
-                <span className={`text-sm font-mono font-bold ${
-                  safetyBuffer > 0 ? 'text-success-green-400' : 'text-peak-red-400'
-                }`}>
+                <span className={`text-sm font-mono font-bold ${safetyBuffer > 0 ? 'text-success-green-400' : 'text-peak-red-400'
+                  }`}>
                   {safetyBuffer > 0 ? '+' : ''}{safetyBuffer.toFixed(1)} kW
                 </span>
               </div>
             )}
           </div>
-          
+
           {/* Weather & factor context */}
           {(data.temperature != null || data.lag7d != null) && (
             <div className="mt-2 pt-2 border-t border-grid-dark-600 space-y-1">
@@ -114,7 +112,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
               )}
             </div>
           )}
-          
+
           {data.isPeak && (
             <div className="mt-2 pt-2 border-t border-grid-dark-600">
               <span className="text-xs text-safety-orange-400 font-semibold">PEAK HOUR (Q0.90 strategy)</span>
@@ -163,11 +161,10 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
 
       {/* Modification Indicator Banner */}
       {isSignificantlyModified && (
-        <div className={`mb-4 p-4 rounded-lg border-2 ${
-          totalChange > 0 
-            ? 'bg-safety-orange-500/10 border-safety-orange-500/40' 
+        <div className={`mb-4 p-4 rounded-lg border-2 ${totalChange > 0
+            ? 'bg-safety-orange-500/10 border-safety-orange-500/40'
             : 'bg-electric-blue-500/10 border-electric-blue-500/40'
-        } animate-pulse`}>
+          } animate-pulse`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">⚡</span>
@@ -182,9 +179,8 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
               </div>
             </div>
             <div className="text-right">
-              <p className={`text-3xl font-bold font-mono ${
-                totalChange > 0 ? 'text-safety-orange-400' : 'text-electric-blue-400'
-              }`}>
+              <p className={`text-3xl font-bold font-mono ${totalChange > 0 ? 'text-safety-orange-400' : 'text-electric-blue-400'
+                }`}>
                 {totalChange > 0 ? '+' : ''}{totalChange.toFixed(1)}%
               </p>
               <p className="text-xs text-gray-400">vs baseline</p>
@@ -201,13 +197,13 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
               <stop offset="5%" stopColor="#00ff88" stopOpacity={0.3} />
               <stop offset="95%" stopColor="#00ff88" stopOpacity={0.05} />
             </linearGradient>
-            
+
             {/* Forecast gradient (blue) */}
             <linearGradient id="forecastGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#00d4ff" stopOpacity={0.4} />
               <stop offset="95%" stopColor="#00d4ff" stopOpacity={0.1} />
             </linearGradient>
-            
+
             {/* Confidence interval gradients */}
             <linearGradient id="ci95Gradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#9333ea" stopOpacity={0.08} />
@@ -222,43 +218,49 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
               <stop offset="95%" stopColor="#c084fc" stopOpacity={0.05} />
             </linearGradient>
           </defs>
-          
+
           <CartesianGrid strokeDasharray="3 3" stroke="#2d2d3d" opacity={0.3} />
-          
+
           <XAxis
             dataKey="time"
             stroke="#6b7280"
             tick={{ fill: '#9ca3af', fontSize: 11 }}
             tickLine={{ stroke: '#3d3d4d' }}
           />
-          
+
           <YAxis
             stroke="#6b7280"
             tick={{ fill: '#9ca3af', fontSize: 11 }}
             tickLine={{ stroke: '#3d3d4d' }}
             label={{ value: 'Load (kW)', angle: -90, position: 'insideLeft', fill: '#9ca3af' }}
           />
-          
+
           <Tooltip content={<CustomTooltip />} />
-          
+
           {/* Peak Hour Shading (18:00 - 22:00) */}
-          {chartData.map((point, idx) => {
-            if (point.isPeak && chartData[idx + 1] && !chartData[idx + 1].isPeak) {
-              return (
-                <ReferenceArea
-                  key={`peak-${idx}`}
-                  x1={point.time}
-                  x2={chartData[idx + 3]?.time || point.time}
-                  fill="#ff3366"
-                  fillOpacity={0.1}
-                  strokeOpacity={0.3}
-                  stroke="#ff3366"
-                />
-              );
-            }
-            return null;
-          })}
-          
+          {(() => {
+            const blocks = [];
+            let start = null;
+            chartData.forEach((d, i) => {
+              if (d.isPeak && start === null) start = d.time;
+              if (!d.isPeak && start !== null) {
+                blocks.push({ start, end: chartData[i - 1].time });
+                start = null;
+              }
+            });
+            if (start !== null) blocks.push({ start, end: chartData[chartData.length - 1].time });
+            return blocks.map((b, i) => (
+              <ReferenceArea
+                key={i}
+                x1={b.start}
+                x2={b.end}
+                fill="#ef4444"
+                fillOpacity={0.15}
+                stroke="none"
+              />
+            ));
+          })()}
+
           {/* 95% Confidence Interval (widest, lightest) */}
           <Area
             type="monotone"
@@ -274,7 +276,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             fill="url(#ci95Gradient)"
             fillOpacity={0.6}
           />
-          
+
           {/* 90% Confidence Interval */}
           <Area
             type="monotone"
@@ -290,7 +292,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             fill="url(#ci90Gradient)"
             fillOpacity={0.7}
           />
-          
+
           {/* 50% Confidence Interval (darkest, highest probability) */}
           <Area
             type="monotone"
@@ -306,7 +308,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             fill="url(#ci50Gradient)"
             fillOpacity={0.8}
           />
-          
+
           {/* Safety Buffer Area (green zone above forecast) */}
           <Area
             type="monotone"
@@ -315,7 +317,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             fill="url(#safetyBuffer)"
             fillOpacity={1}
           />
-          
+
           {/* Forecast Line */}
           <Area
             type="monotone"
@@ -325,7 +327,7 @@ function ForecastChart({ data, startDate, endDate, hasApiData, totalRows }) {
             fill="url(#forecastGradient)"
             fillOpacity={1}
           />
-          
+
           {/* Actual Load (dashed line for reference) */}
           <Area
             type="monotone"

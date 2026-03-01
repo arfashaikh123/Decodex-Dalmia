@@ -33,6 +33,8 @@ function App() {
   const [overPenalty, setOverPenalty] = useState(2);
   // Stage: 1 = Round 1 (₹4/₹2), 2 = Round 2 (₹6/₹2), 3 = Board Review (₹6/₹2)
   const [stage, setStage] = useState(2);
+  // Board-mandated quarterly exposure cap (synced with Stage3ComplianceDashboard)
+  const [exposureCap, setExposureCap] = useState(350000);
 
   // Auto-sync penalty rates to the hackathon-defined values per stage
   const handleStageChange = React.useCallback((newStage) => {
@@ -133,6 +135,7 @@ function App() {
           penalty_under: underPenalty,
           penalty_over: overPenalty,
           stage,
+          exposure_cap: exposureCap,
         }),
       });
       const json = await res.json();
@@ -326,8 +329,10 @@ function App() {
           {/* Penalty Rates (compact inline) */}
           <div className="flex items-center gap-3 px-3 py-1 bg-grid-dark-800 border border-grid-dark-700 rounded-lg">
             <DollarSign className="w-3 h-3 text-gray-500" />
-            <span className="text-xs text-gray-400">Penalty:</span>
-            <label className="text-xs text-gray-400">Under</label>
+            <span className="text-xs text-gray-400">Rate:</span>
+            <label className="text-xs text-gray-400" title={stage >= 2 ? "Penalty for under-forecast during 6PM-10PM peak" : "Penalty for under-forecast"}>
+              {stage >= 2 ? 'Peak Under' : 'Under'}
+            </label>
             <input
               type="number" min="1" max="10" step="0.5"
               value={underPenalty}
@@ -335,6 +340,14 @@ function App() {
               className="w-14 bg-grid-dark-700 border border-grid-dark-600 text-peak-red-400 text-xs rounded px-1 py-0.5 focus:outline-none focus:border-electric-blue-500 font-bold"
             />
             <span className="text-xs text-gray-500">₹/kW</span>
+
+            {stage >= 2 && (
+              <>
+                <label className="text-xs text-gray-400">Base Under</label>
+                <div className="text-gray-300 text-xs font-bold px-1">₹4</div>
+              </>
+            )}
+
             <label className="text-xs text-gray-400">Over</label>
             <input
               type="number" min="1" max="8" step="0.5"
@@ -365,9 +378,9 @@ function App() {
                 ? 'bg-safety-orange-500 text-white'
                 : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
                 }`}
-              title="Stage 2: Round 2 penalty ₹6 under / ₹2 over"
+              title="Stage 2: Revised Peak Penalty ₹6 under / ₹2 over (Off-peak ₹4)"
             >
-              2 · Q75/Q95 · ₹6/₹2
+              2 · Q75/Q95 · ₹6/₹4/₹2
             </button>
             <button
               onClick={() => handleStageChange(3)}
@@ -375,9 +388,9 @@ function App() {
                 ? 'bg-success-green-600 text-white ring-1 ring-success-green-400'
                 : 'bg-grid-dark-700 text-gray-400 hover:text-gray-200'
                 }`}
-              title="Stage 3: Board Review — governance layer on ₹6/₹2 regime"
+              title="Stage 3: Board Review penalty ₹6 peak / ₹4 base / ₹2 over"
             >
-              3 · Board Review
+              3 · Governing · ₹6/₹4/₹2
             </button>
           </div>
 
@@ -707,6 +720,10 @@ function App() {
             abuData={apiData?.asymmetric_bias_uplift}
             penaltyUnder={underPenalty}
             penaltyOver={overPenalty}
+            biasLimitData={apiData?.bias_limit_recalibration}
+            capGuardData={apiData?.exposure_cap_guard}
+            exposureCap={exposureCap}
+            onCapChange={setExposureCap}
           />
         )}
 
